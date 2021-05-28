@@ -1,22 +1,19 @@
+import cv2
 import numpy as np
-# moduly v lokálním adresáři musí být v pythonu 3 importovány s tečkou
-from . import podpurne_funkce
-. import cv2
-. import numpy as np
-. import matplotlib.pyplot as plt
-. import skimage
-from skimage . import data
-from skimage.morphology . import label
-from skimage.color . import rgb2gray
-from skimage . import data
-from skimage.filters.  import gaussian
-from skimage.segmentation . import active_contour
-. import skimage.segmentation
-. import scipy
-. import numpy as np
-. import matplotlib.pyplot as plt
-. import scipy
-from scipy . import ndimage
+import matplotlib.pyplot as plt
+import skimage
+from skimage import data
+from skimage.morphology import label
+from skimage.color import rgb2gray
+from skimage import data
+from skimage.filters import gaussian
+from skimage.segmentation import active_contour
+import skimage.segmentation
+import scipy
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy
+from scipy import ndimage
 
 class VarroaDetector():
    def varoadetektor(adresa):
@@ -39,9 +36,7 @@ class VarroaDetector():
         # rozsah pomeru os:
         maxpomer = 1.6
         minpomer = 1.2
-
-
-
+      
         # nacteni obrazku:
         imgv = cv2.imread(adresa) 
 
