@@ -62,13 +62,8 @@ def test_run_all():
         # gt_ann = json.loads(str(ann_pth))
         with open(ann_pth, 'r') as infile:
             gt_ann = json.load(infile)
-        ground_true_mask = prepare_ground_true_mask(gt_ann, filename)
-        # if True:
-        #     from matplotlib import pyplot as plt
-        #     plt.imshow(im)
-        #     plt.contour(ground_true_mask)
-        #     plt.show()
-        f1i = f1score(ground_true_mask, prediction)
+        ground_true_mask = prepare_ground_true_mask(gt_ann, filename, dataset=True)
+        f1i = f1score(ground_true_mask, prediction, im, show=True)
         # assert f1i > 0.55
         f1s.append(f1i)
 
@@ -77,18 +72,34 @@ def test_run_all():
     # assert f1 > 0.55
 
 
-def f1score(ground_true_mask:np.ndarray, prediction:np.ndarray):
+def f1score(ground_true_mask:np.ndarray, prediction:np.ndarray, image=None, show=False):
     """
     Measure f1 score for one image
     :param ground_true_mask:
     :param prediction:
     :return:
     """
-    f1 = sklearn.metrics.f1_score(ground_true_mask.astype(bool).flatten(), prediction.astype(bool).flatten())
+    if (ground_true_mask.shape[-1] == prediction.shape[-2]) and (ground_true_mask.shape[-2] == prediction.shape[-1]):
+        print(f"Warning: Prediction shape [{ground_true_mask.shape}] does not fit ground true shape [{prediction.shape}]. Tansposition applied.")
+        ground_true_mask=np.rot90(ground_true_mask, k=1)
+
+    if ground_true_mask.shape[-1] != prediction.shape[-1]:
+        raise ValueError(f"Prediction shape [{ground_true_mask.shape}] does not fit ground true shape [{prediction.shape}]")
+    if ground_true_mask.shape[-2] != prediction.shape[-2]:
+        raise ValueError(f"Prediction shape [{ground_true_mask.shape}] does not fit ground true shape [{prediction.shape}]")
+    f1 = sklearn.metrics.f1_score(ground_true_mask.astype(bool).flatten(), prediction.astype(bool).flatten(), average="macro")
+
+    if (image is not None) and show:
+        from matplotlib import pyplot as plt
+        plt.imshow(image)
+        plt.contour(prediction[0,:,:], colors=['red'])
+        plt.contour(ground_true_mask, color=['green'])
+        plt.suptitle(f"f1score={f1}")
+        plt.show()
     return f1
 
 
-def prepare_ground_true_mask(gt_ann, filename):
+def prepare_ground_true_mask(gt_ann, filename, dataset=True):
     name = None
     for ann_im in gt_ann['images']:
         if  ann_im["file_name"] == Path(filename).name:
@@ -102,5 +113,8 @@ def prepare_ground_true_mask(gt_ann, filename):
                         N = len(s)
                         rr, cc = polygon(np.array(s[1:N:2]), np.array(s[0:N:2]))  # (y, x)
                         M[rr, cc] = True
-    return M
 
+    if dataset:
+        # M=M.transpose()
+        M=np.rot90(M, k=3)
+    return M
