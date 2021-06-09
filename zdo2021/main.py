@@ -68,36 +68,60 @@ class VarroaDetector():
             props = skimage.measure.regionprops(imlabel)
 
 
-        pocetdetekovanych = 0 #pocet detekovanych
-        varoa = 0 #detekovana varroa?
+            pocetdetekovanych = 0 #pocet detekovanych
+            varoa = 0 #detekovana varroa?
+            spatnedetekovane = []
 
-        #projit vsechny objekty:
-        for i in range(len(props)):   
+            #projit vsechny objekty:
+            for i in range(len(props)):   
 
-                convexarea = props[i].convex_area    # plocha konvexni obalky 
-                area = props[i].area    # plocha 
-                rozdilkonvexarea = (convexarea - area)/((convexarea+area)/2) # rozdil konvexni obalky a area       
-                perimeter = props[i].perimeter       # obvod   
-                nekompaktnost = (perimeter*perimeter)/area     # vypocet nekompaktnosti
-                major = props[i].major_axis_length # hlavni osa
-                minor =props[i].minor_axis_length # vedlejsi osa
-                if minor == 0: # nedelit nulou
-                    minor = 0.0000001 
-                pomeros = major/minor # pomer os       
+                    convexarea = props[i].convex_area    # plocha konvexni obalky 
+                    area = props[i].area    # plocha 
+                    rozdilkonvexarea = (convexarea - area)/((convexarea+area)/2) # rozdil konvexni obalky a area       
+                    perimeter = props[i].perimeter       # obvod   
+                    nekompaktnost = (perimeter*perimeter)/area     # vypocet nekompaktnosti
+                    major = props[i].major_axis_length # hlavni osa
+                    minor =props[i].minor_axis_length # vedlejsi osa
+                    if minor == 0: # nedelit nulou
+                        minor = 0.0000001 
+                    pomeros = major/minor # pomer os       
 
 
-                if area < areamax and area > areamin:  # splnuje velikost   
-                    if rozdilkonvexarea < rkonvexmax: # splnuje dalsi vlastnosti eliptickeho tvaru
-                        if nekompaktnost < maxnekompakt and nekompaktnost > minnekompakt:
-                            if pomeros < maxpomer and pomeros > minpomer:                        
-                                pocetdetekovanych +=1
-                                ci = props[i].image                                                                  
+                    if area < areamax and area > areamin:  # splnuje velikost   
+                        if rozdilkonvexarea < rkonvexmax: # splnuje dalsi vlastnosti eliptickeho tvaru
+                            if nekompaktnost < maxnekompakt and nekompaktnost > minnekompakt:
+                                if pomeros < maxpomer and pomeros > minpomer:                        
+                                    pocetdetekovanych +=1
+                                    ci = props[i].image  
+                                else:
+                                    spatnedetekovane.append(props[i].label)
+                            else:
+                                spatnedetekovane.append(props[i].label)    
+                        else:
+                            spatnedetekovane.append(props[i].label)
+                    else:
+                        spatnedetekovane.append(props[i].label)
 
-        #print(pocetdetekovanych)   
-        if pocetdetekovanych > 0:
-            varoa = 1
+            #print(pocetdetekovanych)   
+            if pocetdetekovanych > 0:
+                varroa = 1
+             
+            #vymazat spatne            
+            imlabel[np.isin(imlabel, spatnedetekovane)] = 0
 
-        return varoa  ##---------------- ?
+            # vysledny obrazek
+            vyslednyobr =  imthr < imlabel
+
+            # obrazek hotov, vloz ho mezi vysledky
+            result.append(vyslednyobr)
+        
+        # obrazek hotov, vloz ho mezi vysledky
+        navratovahodnota = np.array(result)
+        
+        
+        return navratovahodnota, varroa
+
+           
       
       
            
