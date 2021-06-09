@@ -15,7 +15,6 @@ from scipy import ndimage
 class VarroaDetector(): 
     def __init__(self):
         pass
-
     def predict(self, data):
         """
         :param data: np.ndarray with shape [pocet_obrazku, vyska, sirka, barevne_kanaly]
