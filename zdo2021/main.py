@@ -14,9 +14,15 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import ndimage
 
-class VarroaDetector():    
+class VarroaDetector(): 
+    def __init__(self):
+        pass
 
     def predict(self, data):
+        """
+        :param data: np.ndarray with shape [pocet_obrazku, vyska, sirka, barevne_kanaly]
+        :return: shape [pocet_obrazku, vyska, sirka], 0 - nic, 1 - varroa destructor
+        """
         
         pocetobrazku = data.shape[0]
         vyska = data.shape[1]
@@ -119,7 +125,7 @@ class VarroaDetector():
         navratovahodnota = np.array(result)
         
         
-        return navratovahodnota, varroa
+        return navratovahodnota
 
            
       
