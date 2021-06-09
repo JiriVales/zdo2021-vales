@@ -71,7 +71,6 @@ def test_run_all():
     print(f"f1score={f1}")
     # assert f1 > 0.55
 
-
 def f1score(ground_true_mask:np.ndarray, prediction:np.ndarray, image=None, show=False):
     """
     Measure f1 score for one image
