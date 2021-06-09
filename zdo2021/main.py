@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import skimage
@@ -18,7 +17,14 @@ from scipy import ndimage
 class VarroaDetector():    
 
     def predict(self, data):
-      #Parametry ze zjistovaci mnoziny (20 klestiku):
+        
+        pocetobrazku = data.shape[0]
+        vyska = data.shape[1]
+        sirka = data.shape[2]
+        kanaly = data.shape[3]
+        
+      
+    #Parametry ze zjistovaci mnoziny (20 klestiku):        
         #Prah (klestici vyrazne tmavsi nez zbyla cast)
         prah = 0.2
         #Velikost 
@@ -33,23 +39,33 @@ class VarroaDetector():
         minnekompakt = 13
         # rozsah pomeru os:
         maxpomer = 1.6
-        minpomer = 1.2      
+        minpomer = 1.2 
         
-        # nacteni obrazku:
-        imgv = cv2.imread(data)   ##---------------- ?
-        # stupne sedi:
-        img = rgb2gray(imgv)
-        # prahovani:
-        imthr = img < prah 
-        # vyplni diry - kvuli lesku klestiku:
-        imthr = ndimage.binary_fill_holes(imthr) 
-        # label (vyselektovani jednotlivych obektu)
-        imlabel = label(imthr, background=0)
-        # pocet prvku
-        #pocetvstupnichprvku = np.max(imlabel) 
-        #print(pocetvstupnichprvku)
-        #zjistovani charakteristik:
-        props = skimage.measure.regionprops(imlabel)
+          
+        
+        result = []
+        
+     
+        
+        for i in range(pocetobrazku):
+         
+            # nacteni obrazku:
+            aktualniobrazek = data[i] 
+            # stupne sedi:
+            img = skimage.color.rgb2gray(aktualniobrazek)        
+           
+            # prahovani:
+            imthr = img < prah 
+            # vyplni diry - kvuli lesku klestiku:
+            imthr = ndimage.binary_fill_holes(imthr) 
+            # label (vyselektovani jednotlivych obektu)
+            imlabel = label(imthr, background=0)
+            # pocet prvku
+            #pocetvstupnichprvku = np.max(imlabel) 
+            #print(pocetvstupnichprvku)
+            
+            #zjistovani charakteristik:
+            props = skimage.measure.regionprops(imlabel)
 
 
         pocetdetekovanych = 0 #pocet detekovanych
